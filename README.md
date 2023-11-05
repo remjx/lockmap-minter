@@ -1,46 +1,79 @@
-# Getting Started with Create React App
+# 🔓 LRC-20
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+> Read every word if you decide to test. These will be worthless. Use at your own risk.
 
-## Available Scripts
+This is just a fun experimental standard demonstrating that you can lock bitcoin as a fair mint mechanism for fungible tokens. It by no means should be considered THE standard for fungibility on bitcoin with ordinals, as I believe there are almost certainly better design choices and optimization improvements to be made. Consequently, this is an extremely dynamic experiment, and I strongly discourage any financial decisions to be made on the basis of it's design. I do, however, encourage the bitcoin community to tinker with standard designs and optimizations until a general consensus on best practices is met (or to decide that this is a bad idea altogether!).
 
-In the project directory, you can run:
+## Introduction
 
-### `npm start`
+LRC-20 is the first fungible token protocol utilizing proof-of-lock as the fair mint mechanism.&#x20;
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+The design is a variation of [BSV-20 V1](https://docs.1satordinals.com/bsv20) with a [lockup](https://github.com/shruggr/lockup) contract. Deploy and mint operations require locking bitcoin for a specified number of blocks in order to be valid.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Specification
 
-### `npm test`
+Only differences with BSV-20 are documented here for now.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Deploy
 
-### `npm run build`
+Two fields are added to the deploy operation:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+* `blocks`: The minimum number of blocks bitcoins must be locked for a mint to be valid.
+* `yield`: The maximum number of tokens that can be minted (yielded) for each 1 bitcoin locked. Partial bitcoins locked can mint a proportional amount of tokens.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Deploy transactions require 2 outputs:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. Locking script - [https://github.com/shruggr/lockup](https://github.com/shruggr/lockup).
 
-### `npm run eject`
+The minimum lock to deploy a ticker is 1 bitcoin for 21,000 blocks.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+2. Deploy inscription - [https://docs.1satordinals.com/text-inscriptions](https://docs.1satordinals.com/text-inscriptions)
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+    ```json
+    {
+        "p": "lrc-20",
+        "op": "deploy",
+        "tick": "lock",
+        "max": "21000000",
+        "lim": "1000",
+        "blocks": "21000",
+        "yield": "1000"
+    }
+    ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### Mint
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+Mint transactions require 2 outputs:
 
-## Learn More
+1. Locking script
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Lock duration must be greater than or equal to the `blocks` specified in the deploy inscription.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+2. Mint inscription - [https://docs.1satordinals.com/text-inscriptions](https://docs.1satordinals.com/text-inscriptions)
+
+    ```json
+    {
+        "p": "lrc-20",
+        "op": "mint",
+        "tick": "lock",
+        "amt": "1000"
+    }
+    ```
+
+### Metadata
+
+Content-type should be `application/lrc-20` instead of `application/bsv-20`.
+
+## Minter
+
+Experimental minter is available at https://github.com/remjx/lrc20-minter
+This repo holds the code for the minter.
+To run it locally, `npm install && npm run start`
+
+## References
+
+BRC-20 experiment https://domo-2.gitbook.io/brc-20-experiment
+
+BSV-20 spec https://docs.1satordinals.com/bsv20
+
+shruggr lockup scrypt contract https://github.com/shruggr/lockup
