@@ -225,7 +225,7 @@ export default function App() {
         LRC-20 minter
         <div style={{ display: "inline-block", marginLeft: "12px" }}>
           <a href="https://github.com/remjx/lrc20-minter">
-            <img src="/github.png" alt="source code" height={32} width={32} />
+            <img src="/lrc20-minter/github.png" alt="source code" height={32} width={32} />
           </a>
         </div>
       </h1>
