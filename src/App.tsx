@@ -183,7 +183,7 @@ export default function App() {
         walletAddress: bsvAddress,
       };
       const rawTx = await lockscribeTx(inscription, lock, payer);
-      const broadcastResult = await broadcast(rawTx);
+      await broadcast(rawTx);
       alert('successfully broadcasted')
     } catch (e) {
       console.error(e);
