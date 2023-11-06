@@ -25,7 +25,7 @@ Deploy transactions require 2 outputs:
 
 1. Locking script - [https://github.com/shruggr/lockup](https://github.com/shruggr/lockup).
 
-The minimum lock to deploy a ticker is 1 bitcoin for 21,000 blocks.
+    The minimum lock to deploy a ticker is 1 bitcoin for 21,000 blocks.
 
 2. Deploy inscription - [https://docs.1satordinals.com/text-inscriptions](https://docs.1satordinals.com/text-inscriptions)
 
@@ -41,13 +41,15 @@ The minimum lock to deploy a ticker is 1 bitcoin for 21,000 blocks.
     }
     ```
 
+Example: https://whatsonchain.com/tx/6d70c9c09456cf77cd39e0c84ca623694fffc74ba203f0c86f4058c5cb0c20b0
+
 ### Mint
 
 Mint transactions require 2 outputs:
 
 1. Locking script
 
-Lock duration must be greater than or equal to the `blocks` specified in the deploy inscription.
+    Lock duration must be greater than or equal to the `blocks` specified in the deploy inscription.
 
 2. Mint inscription - [https://docs.1satordinals.com/text-inscriptions](https://docs.1satordinals.com/text-inscriptions)
 
@@ -60,15 +62,18 @@ Lock duration must be greater than or equal to the `blocks` specified in the dep
     }
     ```
 
+Example: https://whatsonchain.com/tx/4d20e2caa2dd6736c38253163c7dd936996bf5b4697c2a86a8618ec509fb0ff0
+
 ### Metadata
 
 Content-type should be `application/lrc-20` instead of `application/bsv-20`.
 
 ## Minter
 
-Experimental minter is available at https://github.com/remjx/lrc20-minter
+Experimental minter is available at https://remjx.github.io/lrc20-minter/
 This repo holds the code for the minter.
 To run it locally, `npm install && npm run start`
+github-pages deployment w/ creat-react-app kinda weird so may need to remove the `/lrc20-minter/` from the urls in app and package.json `"homepage"` to get it working.
 
 ## References
 
