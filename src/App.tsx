@@ -98,7 +98,7 @@ export default function App() {
       const block = Number(formData.get("block"));
       if (!block) throw new Error("Invalid block.");
       const tip = await getBlock()
-      if (tip <= block) {
+      if (block <= tip) {
         throw new Error("Only future blocks are valid.")
       }
       const ordAddress = localStorage.getItem("ownerAddress");
