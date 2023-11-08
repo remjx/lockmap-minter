@@ -172,7 +172,7 @@ export default function App() {
         <div style={{ display: "inline-block", marginLeft: "12px" }}>
           <a href="https://github.com/remjx/lockmap-minter">
             <img
-              src="/lockmap-minter/github.png"
+              src="/github.png"
               alt="source code"
               height={32}
               width={32}

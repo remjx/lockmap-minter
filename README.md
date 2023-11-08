@@ -15,7 +15,7 @@ We invite you to join us in this exciting journey towards building a truly open 
 
 ## Lockmap Minter
 
-Experimental minter is available at https://remjx.github.io/lockmap-minter/. The source code for the minter is available in this repo.
+Experimental minter is available at https://lockmap-minter.vercel.app/. The source code for the minter is available in this repo.
 
 ## References
 
