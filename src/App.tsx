@@ -116,7 +116,7 @@ export default function App() {
       console.log('payer', payer)
       const rawTx = await lockscribeTx(inscription, lock, payer);
       const result = await broadcast(rawTx);
-      console.log('broadcast result', result)
+      console.log('broadcast result', JSON.stringify(result))
       alert("successfully broadcasted");
     } catch (e) {
       console.error(e);
@@ -263,7 +263,7 @@ export default function App() {
               <div style={{ color: "gray", marginTop: "12px" }}>lock:</div>
               <div>
                 <label>bitcoins to lock: </label>
-                <input name="bsv" type="number" value={0.01} disabled={true} />
+                <input name="bsv" type="number" value={0.01} />
               </div>
               <div>
                 current block height: {tipMin}

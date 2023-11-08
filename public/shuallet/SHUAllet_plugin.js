@@ -32,7 +32,7 @@ const broadcast = async txhex => {
         method: 'post',
         body: JSON.stringify({ txhex })
     });
-    if (!r.ok) {
+    if (!r.ok || r.status !== 200) {
         throw new Error(r.text())
     }
     const json = await r.json()
