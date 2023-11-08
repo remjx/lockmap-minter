@@ -18,11 +18,7 @@ const getAddressFromPaymail = async paymail => {
     return address;
 }
 const getBlock = async() => {
-    const r = await fetch(`https://api.whatsonchain.com/v1/bsv/main/chain/info`, {
-        headers: {
-            'Access-Control-Allow-Origin': '*'
-        }
-    });
+    const r = await fetch(`https://api.whatsonchain.com/v1/bsv/main/chain/info`);
     const res = await r.json();
     return res?.blocks;
 }
