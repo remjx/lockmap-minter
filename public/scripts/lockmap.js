@@ -1,11 +1,10 @@
 
 const lockscribeTx = async(
     { data, mediaType, metaDataTemplate, toAddress }, // inscription
-    { address, blocksToLock, satoshisToLock }, // lock
+    { address, block, satoshisToLock }, // lock
     { walletAddress } // payer
 ) => {
-    const currentBlock = await getBlock()
-    const blockHeight = currentBlock + blocksToLock + 3;
+    const blockHeight = block;
     const bsvtx = bsv.Transaction();
 
     // build lock output

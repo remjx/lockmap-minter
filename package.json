@@ -1,8 +1,8 @@
 {
-  "name": "lrc20-minter",
+  "name": "lockmap-minter",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://remjx.github.io/lrc20-minter",
+  "homepage": "https://remjx.github.io/lockmap-minter",
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",

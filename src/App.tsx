@@ -10,7 +10,7 @@ interface Inscription {
 }
 interface Lock {
   address: string;
-  blocksToLock: number;
+  block: number;
   satoshisToLock: number;
 }
 interface Payer {
@@ -34,52 +34,16 @@ declare const setupWallet: any;
 declare const restoreWallet: any;
 declare const backupWallet: any;
 declare const getWalletBalance: any;
-// declare const unlockCoins: any;
-
-function generateDeployInscription(opts: {
-  tick: string;
-  max: number;
-  lim: number;
-  blocks: number;
-  yieldFactor: number;
-}) {
-  Object.values(opts).forEach((value) => {
-    if (!value) throw new Error("Missing opt");
-  });
-  return JSON.stringify({
-    p: "lrc-20",
-    op: "deploy",
-    tick: opts.tick,
-    max: opts.max.toString(),
-    lim: opts.lim.toString(),
-    blocks: opts.blocks.toString(),
-    yield: opts.yieldFactor.toString(),
-  });
-}
-
-function generateMintInscription(opts: { tick: string; amt: number }) {
-  Object.values(opts).forEach((value) => {
-    if (!value) throw new Error("Missing opt");
-  });
-  return JSON.stringify({
-    p: "lrc-20",
-    op: "mint",
-    tick: opts.tick,
-    amt: opts.amt.toString(),
-  });
-}
+declare const getBlock: any;
+declare const unlockCoins: any;
 
 export default function App() {
   const [connecting, setConnecting] = useState(false);
   const [connectedWalletAddress, setConnectedWalletAddress] = useState("");
   const [balance, setBalance] = useState(0);
-  const [op, setOp] = useState<"deploy" | "mint">("mint");
-  const [status, setStatus] = useState<"idle" | "submitting">(
-    "idle"
-  );
-  const bsvInputRef = useRef<HTMLInputElement>(null)
-  const blocksToLockInputRef = useRef<HTMLInputElement>(null)
-  // const [unlocking, setUnlocking] = useState(false)
+  const [status, setStatus] = useState<"idle" | "submitting">("idle");
+  const [tipMin, setTipMin] = useState<number>()
+  const [unlocking, setUnlocking] = useState(false)
   const fileUploadRef = useRef<HTMLInputElement>(null);
   async function handleRestoreWallet() {
     if (fileUploadRef.current) {
@@ -90,8 +54,8 @@ export default function App() {
     setConnecting(true);
     try {
       await setupWallet();
-      const addr = localStorage.getItem("walletAddress")
-      if (typeof addr !== 'string') {
+      const addr = localStorage.getItem("walletAddress");
+      if (typeof addr !== "string") {
         throw new Error("Error connecting wallet");
       }
       setConnectedWalletAddress(addr);
@@ -113,70 +77,42 @@ export default function App() {
     }
   }
   useEffect(() => {
-    const addr = localStorage.getItem("walletAddress")
-    if (typeof addr === 'string') {
+    const addr = localStorage.getItem("walletAddress");
+    if (typeof addr === "string") {
       setConnectedWalletAddress(addr);
       handleRefreshBalance();
     }
   }, [connectedWalletAddress]);
-  useEffect(() => {
-    if (op === "deploy") {
-      if (blocksToLockInputRef.current) blocksToLockInputRef.current.value = "21000"
-      if (bsvInputRef.current) bsvInputRef.current.value = "1"
-    } else {
-      if (blocksToLockInputRef.current) blocksToLockInputRef.current.value = ""
-      if (bsvInputRef.current) bsvInputRef.current.value = ""
-    }
-  }, [op])
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     const formData = new FormData(e.currentTarget);
     e.preventDefault();
     setStatus("submitting");
     try {
-      const bsv = await handleRefreshBalance()
-      const bsvAmt = Number(formData.get("bsv"));
+      const bsv = await handleRefreshBalance();
+      const bsvAmt = 1;
       if (bsv < bsvAmt) {
         throw new Error("Insufficient balance");
       }
-      const blocksToLock = Number(formData.get("blocksToLock"));
-      if (!blocksToLock) throw new Error("Invalid blocks to lock.");
-      let inscriptionData: string;
-      switch (op) {
-        case "deploy": {
-          inscriptionData = generateDeployInscription({
-            tick: String(formData.get("tick")),
-            max: Number(formData.get("max")),
-            lim: Number(formData.get("lim")),
-            blocks: Number(formData.get("blocks")),
-            yieldFactor: Number(formData.get("yield")),
-          });
-          break;
-        }
-        case "mint": {
-          inscriptionData = generateMintInscription({
-            tick: String(formData.get("tick")),
-            amt: Number(formData.get("amt")),
-          });
-          break;
-        }
-        default: {
-          throw new Error("Invalid op.");
-        }
+      const block = Number(formData.get("block"));
+      if (!block) throw new Error("Invalid block.");
+      const tip = await getBlock()
+      if (tip <= block) {
+        throw new Error("Only future blocks are valid.")
       }
       const ordAddress = localStorage.getItem("ownerAddress");
       const bsvAddress = localStorage.getItem("walletAddress");
       if (!ordAddress || !bsvAddress)
         throw new Error("Error getting addresses.");
       const inscription: Inscription = {
-        data: inscriptionData,
-        mediaType: "application/lrc-20",
+        data: `${block}.lockmap`,
+        mediaType: "text/plain",
         metaDataTemplate: null,
         toAddress: ordAddress,
       };
       const lock: Lock = {
         address: bsvAddress,
-        blocksToLock,
+        block,
         satoshisToLock: parseInt((bsvAmt * 100_000_000).toString(), 10),
       };
       const payer: Payer = {
@@ -184,7 +120,7 @@ export default function App() {
       };
       const rawTx = await lockscribeTx(inscription, lock, payer);
       await broadcast(rawTx);
-      alert('successfully broadcasted')
+      alert("successfully broadcasted");
     } catch (e) {
       console.error(e);
       alert(e);
@@ -200,32 +136,47 @@ export default function App() {
     return bsv;
   }
 
-  // const handleUnlock: React.FormEventHandler<HTMLFormElement> = async (e) => {
-  //   e.preventDefault()
-  //   setUnlocking(true)
-  //   try {
-  //     const formData = new FormData(e.currentTarget);
-  //     const txid = String(formData.get("txid"))
-  //     const walletAddress = localStorage.getItem("walletAddress")
-  //     const walletKey = localStorage.getItem("walletKey")
-  //     const rawTx = await unlockCoins(walletKey, walletAddress, txid)
-  //     const unlockResult = await broadcast(rawTx)
-  //     alert(unlockResult)
-  //   } catch (e) {
-  //     console.error(e)
-  //     alert(e);
-  //   } finally {
-  //     setUnlocking(false)
-  //   }
-  // }
+  useEffect(() => {
+    const getTipMin = async () => {
+      const t = await getBlock()
+      setTipMin(t)
+    }
+    getTipMin()
+    const interval = setInterval(getTipMin, 30_000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const handleUnlock: React.FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault()
+    setUnlocking(true)
+    try {
+      const formData = new FormData(e.currentTarget);
+      const txid = String(formData.get("txid"))
+      const walletAddress = localStorage.getItem("walletAddress")
+      const walletKey = localStorage.getItem("walletKey")
+      const rawTx = await unlockCoins(walletKey, walletAddress, txid)
+      const unlockResult = await broadcast(rawTx)
+      alert(unlockResult)
+    } catch (e) {
+      console.error(e)
+      alert(e);
+    } finally {
+      setUnlocking(false)
+    }
+  }
 
   return (
     <div>
       <h1 style={{ marginBottom: "2px" }}>
-        LRC-20 minter
+        Lockmap Minter
         <div style={{ display: "inline-block", marginLeft: "12px" }}>
-          <a href="https://github.com/remjx/lrc20-minter">
-            <img src="/lrc20-minter/github.png" alt="source code" height={32} width={32} />
+          <a href="https://github.com/remjx/lockmap-minter">
+            <img
+              src="/lockmap-minter/github.png"
+              alt="source code"
+              height={32}
+              width={32}
+            />
           </a>
         </div>
       </h1>
@@ -267,7 +218,9 @@ export default function App() {
                 try {
                   const json = JSON.parse(e?.target?.result as string);
                   restoreWallet(json.ordPk, json.payPk);
-                  setConnectedWalletAddress(String(localStorage.getItem("walletAddress")));
+                  setConnectedWalletAddress(
+                    String(localStorage.getItem("walletAddress"))
+                  );
                 } catch (e) {
                   console.log(e);
                   alert(e);
@@ -282,7 +235,16 @@ export default function App() {
         </>
       ) : (
         <>
-          <div>connected wallet address: <a href={`https://whatsonchain.com/address/${connectedWalletAddress}`} target="_blank" rel="noreferrer">{connectedWalletAddress}</a></div>
+          <div>
+            connected wallet address:{" "}
+            <a
+              href={`https://whatsonchain.com/address/${connectedWalletAddress}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {connectedWalletAddress}
+            </a>
+          </div>
           <div style={{ marginBottom: "8px" }}>
             balance: {balance} BSV{" "}
             <button onClick={handleRefreshBalance}>refresh balance</button>
@@ -299,134 +261,52 @@ export default function App() {
           </button>
           <br />
           <br />
-          <div style={{ marginBottom: "12px" }}>
-            <label>op:</label>
-            <input
-              type="radio"
-              name="op"
-              checked={op === "deploy"}
-              onChange={() => setOp("deploy")}
-            />
-            <label>deploy</label>
-            <input
-              type="radio"
-              name="op"
-              checked={op === "mint"}
-              onChange={() => setOp("mint")}
-            />
-            <label>mint</label>
-          </div>
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: "12px" }}>
               <div style={{ color: "gray", marginTop: "12px" }}>lock:</div>
               <div>
-                <label># bitcoins to lock: </label>
-                <input
-                  name="bsv"
-                  type="number"
-                  min={0.00000001}
-                  step={0.00000001}
-                  disabled={status === "submitting"}
-                  ref={bsvInputRef}
-                />
+                <label>bitcoins to lock: </label>
+                <input name="bsv" type="number" value={1} disabled={true} />
               </div>
               <div>
-                <label># blocks to lock: </label>
+                current block height: {tipMin}
+              </div>
+              <div>
+                <label>lockmap #: </label>
                 <input
-                  name="blocksToLock"
+                  name="block"
                   type="number"
-                  min={1}
+                  min={tipMin}
                   disabled={status === "submitting"}
-                  ref={blocksToLockInputRef}
                 />
               </div>
             </div>
-            <div style={{ color: "gray" }}>inscription:</div>
-            {op === "deploy" && (
-              <>
-                <div>
-                  <label>tick: </label>
-                  <input
-                    name="tick"
-                    type="text"
-                    disabled={status === "submitting"}
-                  />
-                </div>
-                <div>
-                  <label>max: </label>
-                  <input
-                    name="max"
-                    type="number"
-                    min={0}
-                    disabled={status === "submitting"}
-                  />
-                </div>
-                <div>
-                  <label>lim: </label>
-                  <input
-                    name="lim"
-                    type="number"
-                    min={0}
-                    disabled={status === "submitting"}
-                  />
-                </div>
-                <div>
-                  <label>blocks: </label>
-                  <input
-                    name="blocks"
-                    type="number"
-                    min={1}
-                    disabled={status === "submitting"}
-                  />
-                </div>
-                <div>
-                  <label>yield: </label>
-                  <input
-                    name="yield"
-                    type="number"
-                    min={1}
-                    disabled={status === "submitting"}
-                  />
-                </div>
-              </>
-            )}
-            {op === "mint" && (
-              <>
-                <div>
-                  <label>tick: </label>
-                  <input
-                    name="tick"
-                    type="text"
-                    disabled={status === "submitting"}
-                  />
-                </div>
-                <div>
-                  <label>amt: </label>
-                  <input
-                    name="amt"
-                    min={0}
-                    disabled={status === "submitting"}
-                  />
-                </div>
-              </>
-            )}
             <div style={{ color: "red", marginTop: "12px" }}>
               warning: use this experimental tool at your own risk.
               <br />
-              warning: token availability unknown. wen indexer?
-              <br />
+            </div>
+            <div>
+                to check if a lockmap has been claimed,
+                1. search <a href={`https://hodlnet.sh`} target="_blank" rel="noreferrer">hodlnet.sh</a> for [blocknumber].lockmap
+                2. click the "woc" tag to view transaction on whatsonchain. valid mint looks like <a href="/example.png" target="_blank">this</a>
+                <br />
             </div>
             <br />
-            <button disabled={status === "submitting"}>{status === 'submitting' ? 'submitting' : 'submit'}</button>
+            <button disabled={status === "submitting"}>
+              {status === "submitting" ? "submitting" : "submit"}
+            </button>
           </form>
-          <br/>
-          <br/>
-          {/* <div>unlock:</div>
+          <br />
+          <div>
+            Once your .lockmap has been minted, it is immediately tradeable as a 1SatOrdinal. Import your SHUAllet keys into a 1Sat-compatible wallet.
+          </div>
+          <br />
+          <div>unlock:</div>
           <form onSubmit={handleUnlock}>
               <input placeholder="txid" name="txid" type="text" disabled={unlocking}/>
             <button type="submit" disabled={unlocking}>unlock</button>
           </form>
-          <br/> */}
+          <br/>
         </>
       )}
     </div>

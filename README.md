@@ -1,84 +1,28 @@
-# 🔓 LRC-20
+# 🔓 Lockmap Theory 101
 
-> Read every word if you decide to test. These will be worthless. Use at your own risk.
+A New Standard for a Bitcoin Metaverse. It takes advantage of the nature of data's unique ability to time travel into the future.
 
-This is just a fun experimental standard demonstrating that you can lock bitcoin as a fair mint mechanism for fungible tokens. It by no means should be considered THE standard for fungibility on bitcoin with ordinals, as I believe there are almost certainly better design choices and optimization improvements to be made. Consequently, this is an extremely dynamic experiment, and I strongly discourage any financial decisions to be made on the basis of it's design. I do, however, encourage the bitcoin community to tinker with standard designs and optimizations until a general consensus on best practices is met (or to decide that this is a bad idea altogether!).
+## What is Lockmap?
 
-## Introduction
+Inspired by [Bitmap](https://gitbook.bitmap.land/) on BTC which is "a consensus standard that allows anybody to claim the geospatial digital real estate of a *[past]* Bitcoin block", Lockmap on BSV allows anybody to claim a *future* Bitcoin block. This process is achieved by being the first to inscribe the text "[blocknumber].lockmap" onto a satoshi using the [1SatOrdinals](https://docs.1satordinals.com/) Inscription standard and in the same transaction lock 1 whole bitcoin until that future block height with [lockup](https://github.com/shruggr/lockup), an [sCrypt](https://scrypt.io/) smart contract. This process is equitable and decentralized, transmuting any Bitcoin block into a part of the metaverse.
 
-LRC-20 is the first fungible token protocol utilizing proof-of-lock as the fair mint mechanism.&#x20;
+Platforms can parse this block data into a 5D realm and grant build access to block owners, creating a new paradigm for open-source development.
+Lockmap theory maps Bitcoin's data landscape to metaspatial analogues, bringing to light the base substrate of a persistent metaverse.
 
-The design is a variation of [BSV-20 V1](https://docs.1satordinals.com/bsv20) with a [lockup](https://github.com/shruggr/lockup) contract. Deploy and mint operations require locking bitcoin for a specified number of blocks in order to be valid.
+## Join the Revolution
 
-## Specification
+We invite you to join us in this exciting journey towards building a truly open metaverse that scales entirely on the L1 base layer of Bitcoin. Whether you're a builder, a visionary, or simply a Bitcoin enthusiast, there's a place for you in the Lockmap community. Get involved today and help shape the future of Bitcoin.
 
-Only differences with BSV-20 are documented here for now.
+## Lockmap Minter
 
-### Deploy
-
-Two fields are added to the deploy operation:
-
-* `blocks`: The minimum number of blocks bitcoins must be locked for a mint to be valid.
-* `yield`: The maximum number of tokens that can be minted (yielded) for each 1 bitcoin locked. Partial bitcoins locked can mint a proportional amount of tokens.
-
-Deploy transactions require 2 outputs:
-
-1. Locking script - [https://github.com/shruggr/lockup](https://github.com/shruggr/lockup).
-
-    The minimum lock to deploy a ticker is 1 bitcoin for 21,000 blocks.
-
-2. Deploy inscription - [https://docs.1satordinals.com/text-inscriptions](https://docs.1satordinals.com/text-inscriptions)
-
-    ```json
-    {
-        "p": "lrc-20",
-        "op": "deploy",
-        "tick": "lock",
-        "max": "21000000",
-        "lim": "1000",
-        "blocks": "21000",
-        "yield": "1000"
-    }
-    ```
-
-Example: https://whatsonchain.com/tx/6d70c9c09456cf77cd39e0c84ca623694fffc74ba203f0c86f4058c5cb0c20b0
-
-### Mint
-
-Mint transactions require 2 outputs:
-
-1. Locking script
-
-    Lock duration must be greater than or equal to the `blocks` specified in the deploy inscription.
-
-2. Mint inscription - [https://docs.1satordinals.com/text-inscriptions](https://docs.1satordinals.com/text-inscriptions)
-
-    ```json
-    {
-        "p": "lrc-20",
-        "op": "mint",
-        "tick": "lock",
-        "amt": "1000"
-    }
-    ```
-
-Example: https://whatsonchain.com/tx/4d20e2caa2dd6736c38253163c7dd936996bf5b4697c2a86a8618ec509fb0ff0
-
-### Metadata
-
-Content-type should be `application/lrc-20` instead of `application/bsv-20`.
-
-## Minter
-
-Experimental minter is available at https://remjx.github.io/lrc20-minter/
-This repo holds the code for the minter.
-To run it locally, `npm install && npm run start`
-github-pages deployment w/ creat-react-app kinda weird so may need to remove the `/lrc20-minter/` from the urls in app and package.json `"homepage"` to get it working.
+Experimental minter is available at https://remjx.github.io/lockmap-minter/. The source code for the minter is available in this repo.
 
 ## References
 
-BRC-20 experiment https://domo-2.gitbook.io/brc-20-experiment
+bitmap theory 101 https://gitbook.bitmap.land/theory/readme
 
-BSV-20 spec https://docs.1satordinals.com/bsv20
+1sat ordinals https://docs.1satordinals.com/
+
+scrypt.io https://scrypt.io/
 
 shruggr lockup scrypt contract https://github.com/shruggr/lockup
