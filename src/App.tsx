@@ -260,10 +260,9 @@ export default function App() {
           <br />
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: "12px" }}>
-              <div style={{ color: "gray", marginTop: "12px" }}>lock:</div>
               <div>
                 <label>bitcoins to lock: </label>
-                <input name="bsv" type="number" value={0.01} />
+                <input name="bsv" type="number" value={1} readOnly />
               </div>
               <div>
                 current block height: {tipMin}
@@ -273,29 +272,27 @@ export default function App() {
                 <input
                   name="block"
                   type="number"
-                  min={tipMin}
+                  min={Number(tipMin) + 1}
                   disabled={status === "submitting"}
                 />
               </div>
             </div>
-            <div style={{ color: "red", marginTop: "12px" }}>
-              warning: use this experimental tool at your own risk.
-              <br />
+            <div>
+                To check if a lockmap has been claimed, search <a href={`https://hodlnet.sh`} target="_blank" rel="noreferrer">hodlnet.sh</a> for [blocknumber].lockmap.{' '}
+                A valid mint tx looks like <a href="/example-lockmap-tx.png" target="_blank">this</a>.
             </div>
             <div>
-                to check if a lockmap has been claimed, search <a href={`https://hodlnet.sh`} target="_blank" rel="noreferrer">hodlnet.sh</a> for [blocknumber].lockmap
-                a valid mint tx looks like <a href="/example.png" target="_blank">this</a>
-                <br />
+              Once minted, lockmaps are immediately tradeable as 1SatOrdinals. Import your SHUAllet keys into a 1Sat-compatible wallet/marketplace.
             </div>
             <br />
+            <div style={{ color: "red" }}>
+              Warning: use this experimental tool at your own risk.
+            </div>
+            <br/>
             <button disabled={status === "submitting"}>
               {status === "submitting" ? "submitting" : "submit"}
             </button>
           </form>
-          <br />
-          <div>
-            Once minted, lockmaps are immediately tradeable as 1SatOrdinals. Import your SHUAllet keys into a 1Sat-compatible wallet/marketplace.
-          </div>
           <br />
           <div>unlock:</div>
           <form onSubmit={handleUnlock}>
