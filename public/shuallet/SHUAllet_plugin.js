@@ -28,11 +28,15 @@ const getRawtx = async txid => {
     return raw;
 }
 const broadcast = async txhex => {
-    const r = await (await fetch(`https://api.whatsonchain.com/v1/bsv/main/tx/raw`, {
+    const r = await fetch(`https://api.whatsonchain.com/v1/bsv/main/tx/raw`, {
         method: 'post',
         body: JSON.stringify({ txhex })
-    })).json();
-    return r;
+    });
+    if (!r.ok) {
+        throw new Error(r.text())
+    }
+    const json = await r.json()
+    return json;
 }
 class BSocial {
     constructor(appName) {

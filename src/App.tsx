@@ -77,12 +77,12 @@ export default function App() {
   }, [connectedWalletAddress]);
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
-    const formData = new FormData(e.currentTarget);
     e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const bsvAmt = Number(formData.get("bsv"));
     setStatus("submitting");
     try {
       const bsv = await handleRefreshBalance();
-      const bsvAmt = Number(formData.get("bsv"));
       console.log('bsvAmt', bsvAmt)
       if (bsv < bsvAmt) {
         throw new Error("Insufficient balance");
@@ -103,16 +103,20 @@ export default function App() {
         metaDataTemplate: null,
         toAddress: ordAddress,
       };
+      console.log('inscription', inscription)
       const lock: Lock = {
         address: bsvAddress,
         block,
         satoshisToLock: parseInt((bsvAmt * 100_000_000).toString(), 10),
       };
+      console.log('lock', lock)
       const payer: Payer = {
         walletAddress: bsvAddress,
       };
+      console.log('payer', payer)
       const rawTx = await lockscribeTx(inscription, lock, payer);
-      await broadcast(rawTx);
+      const result = await broadcast(rawTx);
+      console.log('broadcast result', result)
       alert("successfully broadcasted");
     } catch (e) {
       console.error(e);
