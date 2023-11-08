@@ -277,22 +277,24 @@ export default function App() {
                 />
               </div>
             </div>
-            <div>
-                To check if a lockmap has been claimed, search <a href={`https://hodlnet.sh`} target="_blank" rel="noreferrer">hodlnet.sh</a> for [blocknumber].lockmap.{' '}
-                A valid mint tx looks like <a href="/example-lockmap-tx.png" target="_blank">this</a>.
-            </div>
-            <div>
-              Once minted, lockmaps are immediately tradeable as 1SatOrdinals. Import your SHUAllet keys into a 1Sat-compatible wallet/marketplace.
-            </div>
-            <br />
             <div style={{ color: "red" }}>
               Warning: use this experimental tool at your own risk.
+            </div>
+            <div style={{ color: "red" }}>
+              Warning: Claim status unknown. <a href="https://github.com/remjx/lockmap-minter/issues/1" target="_blank" rel="noreferrer">Need indexer</a>,
             </div>
             <br/>
             <button disabled={status === "submitting"}>
               {status === "submitting" ? "submitting" : "submit"}
             </button>
           </form>
+          <br/>
+          <div>
+            A valid mint tx looks like <a href="/example-lockmap-tx.png" target="_blank">this</a>.
+          </div>
+          <div>
+            Once minted, lockmaps are immediately tradeable as 1SatOrdinals. Import your SHUAllet keys into a 1Sat-compatible wallet/marketplace.
+          </div>
           <br />
           <div>unlock:</div>
           <form onSubmit={handleUnlock}>
