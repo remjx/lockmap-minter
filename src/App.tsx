@@ -266,7 +266,7 @@ export default function App() {
               <div style={{ color: "gray", marginTop: "12px" }}>lock:</div>
               <div>
                 <label>bitcoins to lock: </label>
-                <input name="bsv" type="number" value={1} disabled={true} />
+                <input name="bsv" type="number" value={0.01} disabled={true} />
               </div>
               <div>
                 current block height: {tipMin}
@@ -286,9 +286,8 @@ export default function App() {
               <br />
             </div>
             <div>
-                to check if a lockmap has been claimed,
-                1. search <a href={`https://hodlnet.sh`} target="_blank" rel="noreferrer">hodlnet.sh</a> for [blocknumber].lockmap
-                2. click the "woc" tag to view transaction on whatsonchain. valid mint looks like <a href="/example.png" target="_blank">this</a>
+                to check if a lockmap has been claimed, search <a href={`https://hodlnet.sh`} target="_blank" rel="noreferrer">hodlnet.sh</a> for [blocknumber].lockmap
+                a valid mint tx looks like <a href="/example.png" target="_blank">this</a>
                 <br />
             </div>
             <br />
@@ -298,7 +297,7 @@ export default function App() {
           </form>
           <br />
           <div>
-            Once your .lockmap has been minted, it is immediately tradeable as a 1SatOrdinal. Import your SHUAllet keys into a 1Sat-compatible wallet.
+            Once minted, lockmaps are immediately tradeable as 1SatOrdinals. Import your SHUAllet keys into a 1Sat-compatible wallet/marketplace.
           </div>
           <br />
           <div>unlock:</div>
