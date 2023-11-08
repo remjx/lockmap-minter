@@ -90,7 +90,7 @@ export default function App() {
     setStatus("submitting");
     try {
       const bsv = await handleRefreshBalance();
-      const bsvAmt = 1;
+      const bsvAmt = Number(formData.get("block"));
       if (bsv < bsvAmt) {
         throw new Error("Insufficient balance");
       }
