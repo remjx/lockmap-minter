@@ -20,15 +20,7 @@ declare const lockscribeTx: (
   inscription: Inscription,
   lock: Lock,
   payer: Payer
-) => {
-  bsvtx: any;
-  utxos: {
-    satoshis: number;
-    script: string;
-    txid: string;
-    vout: number;
-  }[];
-};
+) => string;
 declare const broadcast: any;
 declare const setupWallet: any;
 declare const restoreWallet: any;
