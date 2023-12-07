@@ -272,7 +272,7 @@ export default function App() {
                 <input
                   name="block"
                   type="number"
-                  min={Number(tipMin) + 1}
+                  min={Number(tipMin || 0) + 1}
                   disabled={status === "submitting"}
                 />
               </div>
