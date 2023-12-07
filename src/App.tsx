@@ -161,6 +161,7 @@ export default function App() {
       setUnlocking(false)
     }
   }
+  const [lockmapNumber, setLockmapNumber] = useState<number>()
 
   return (
     <div>
@@ -177,16 +178,13 @@ export default function App() {
           </a>
         </div>
       </h1>
-      <div style={{ marginBottom: "16px" }}>
-        Follow{" "}
-        <a
-          href="https://x.com/lockinalswallet"
-          target="_blank"
-          rel="noreferrer"
-        >
-          @lockinalswallet
-        </a>
+      <div>
+        use this experimental software at your own risk.
       </div>
+      <div>
+        recommended browser is firefox.
+      </div>
+      <br/>
 
       {!connectedWalletAddress ? (
         <>
@@ -274,29 +272,30 @@ export default function App() {
                   type="number"
                   min={Number(tipMin || 0) + 1}
                   disabled={status === "submitting"}
+                  onChange={(e) => setLockmapNumber(Number(e.target.value))}
                 />
               </div>
             </div>
-            <div style={{ color: "red" }}>
-              Warning: use this experimental tool at your own risk.
+            <div>
+              Check availability on <a href={`https://hodlnet.sh/search?q=ord+text%2Fplain+${lockmapNumber}.lockmap`} target="_blank" rel="noreferrer">hodlnet.sh</a>,
             </div>
-            <div style={{ color: "red" }}>
-              Warning: Claim status unknown. <a href="https://github.com/remjx/lockmap-minter/issues/1" target="_blank" rel="noreferrer">Need indexer</a>,
+            <div>
+              A valid mint tx looks like <a href="/example-lockmap-tx.png" target="_blank">this</a>.
+            </div>
+            <div>
+              Once minted, lockmaps are immediately tradeable as 1SatOrdinals. SHUAllet keys can be imported into a 1Sat compatible wallet/marketplace like <a href="https://github.com/Panda-Wallet/panda-wallet" target="_blank" rel="noreferrer"> Panda Wallet</a> .
+            </div>
+            <div>
+              Your bitcoin will be locked until the specified lockmap number / block height.
             </div>
             <br/>
             <button disabled={status === "submitting"}>
               {status === "submitting" ? "submitting" : "submit"}
             </button>
           </form>
-          <br/>
-          <div>
-            A valid mint tx looks like <a href="/example-lockmap-tx.png" target="_blank">this</a>.
-          </div>
-          <div>
-            Once minted, lockmaps are immediately tradeable as 1SatOrdinals. Import your SHUAllet keys into a 1Sat-compatible wallet/marketplace.
-          </div>
           <br />
           <div>unlock:</div>
+          <div>after block passes, you can enter mint tx here to return unlocked coins to wallet address.</div>
           <form onSubmit={handleUnlock}>
               <input placeholder="txid" name="txid" type="text" disabled={unlocking}/>
             <button type="submit" disabled={unlocking}>unlock</button>
