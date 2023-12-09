@@ -27,6 +27,7 @@ declare const restoreWallet: any;
 declare const backupWallet: any;
 declare const getWalletBalance: any;
 declare const getBlock: any;
+declare const clearUTXOs: any;
 declare const unlockCoins: any;
 
 export default function App() {
@@ -63,6 +64,7 @@ export default function App() {
       if (hasBackup) {
         localStorage.clear();
         setConnectedWalletAddress("");
+        clearUTXOs();
       }
     } catch (e) {
       alert(e);
